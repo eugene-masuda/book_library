@@ -1,5 +1,7 @@
 class BooksController < ApplicationController
   before_action :set_book, only: [:show, :edit, :update, :destroy, :library]
+  before_action :authenticate_user!, except: [:index, :show]
+
 
   # GET /books
   # GET /books.json
@@ -14,7 +16,7 @@ class BooksController < ApplicationController
 
   # GET /books/new
   def new
-    @book = Book.new
+    @book = current_user.books.build
   end
 
   # GET /books/1/edit
@@ -24,7 +26,7 @@ class BooksController < ApplicationController
   # POST /books
   # POST /books.json
   def create
-    @book = Book.new(book_params)
+    @book = current_user.books.build(book_params)
 
     respond_to do |format|
       if @book.save
@@ -58,6 +60,23 @@ class BooksController < ApplicationController
     respond_to do |format|
       format.html { redirect_to books_url, notice: 'Book was successfully destroyed.' }
       format.json { head :no_content }
+    end
+  end
+  # Add and remove books to library
+  # for current_user
+  def library
+    type = params[:type]
+
+    if type == "add"
+      current_user.library_additions << @book
+      redirect_to library_index_path, notice: "#{@book.title} was added to your library"
+
+    elsif type == "remove"
+      current_user.library_additions.delete(@book)
+      redirect_to root_path, notice: "#{@book.title} was removed from your library"
+    else
+      # Type missing, nothing happens
+      redirect_to book_path(@book), notice: "Looks like nothing happened. Try once more!"
     end
   end
 
