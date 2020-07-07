@@ -19,11 +19,11 @@
           <% if user_added_to_library?(current_user, book) %>
 
             <%= link_to 'Remove from library', add_book_path(book, type: "remove"), method: :put, class: "button is-danger is-fullwidth" %>
-
-            <% if controller.controller_name == "library" %>
-              <%= link_to 'PDF Download', rails_blob_path(book.pdf_file, disposition: "attachment"), class:"button is-success is-fullwidth mt1" %>
+            <%if book.pdf_file.attachment.present? %>
+              <% if controller.controller_name == "library" %>
+                <%= link_to 'PDF Download', rails_blob_path(book.pdf_file, disposition: "attachment"), class:"button is-success is-fullwidth mt1" %>
+              <% end %>
             <% end %>
-
           <% else %>
             <%= link_to 'Add to library', add_book_path(book, type: "add"), method: :put, class: "button is-link is-fullwidth" %>
           <% end %>
